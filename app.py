@@ -1,11 +1,23 @@
 
-from bottle import route, run, default_app
+Learn more or give us feedback
+from SimpleWebSocketServer import SimpleWebSocketServer,WebSocket
+from chatbot import get_response
 
-@route('/')
-def index():
-    return "<h1> hello OpenShift V3 Ninja</h1>"
 
-if __name__ == '__main__':
-    run(host='0.0.0.0', port=8080)
+class ChatServer(WebSocket):
+    def handleMessage(self):
+        # echo message back to client
+        message = self.data
+        response = get_response(message)
+        self.sendMessage(response)
+    
+    def handleConnected(self):
+        print(self.address, 'connected')
+    
+    def handleClose(self):
+        print(self.address, 'closed')
 
-app = default_app()
+    
+
+server = SimpleWebSocketServer('',8080,ChatServer)
+server.serveforever()
